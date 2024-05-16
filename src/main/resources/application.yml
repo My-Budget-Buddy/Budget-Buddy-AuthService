@@ -1,0 +1,34 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: auth-service
+  datasource:
+    url: ${PG_DB_URL}/budgetbuddy-auth
+    username: ${PG_DB_USER}
+    password: ${PG_DB_PW}
+  output:
+    ansi:
+      enabled: ALWAYS
+
+  # For testing only!
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+  instance:
+    leaseRenewalIntervalSeconds: 30
+
+# TODO: RabbitMQ config
+exchanges:
+  fanout: payment
+
+queues:
+  fanout: paymentQueue
+
+routing-key: key1234
