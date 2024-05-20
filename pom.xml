@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.skillstorm</groupId>
-    <artifactId>authservice</artifactId>
+    <artifactId>auth-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>authservice</name>
+    <name>auth-service</name>
     <description>BudgetBuddy authentication service.</description>
     <properties>
         <java.version>17</java.version>

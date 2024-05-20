@@ -8,18 +8,23 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class ExceptionHandlerAdvice {
 
-    @ExceptionHandler(AppUserAlreadyExistsException.class)
-    public ResponseEntity<String> handleEntityAlreadyExists(AppUserAlreadyExistsException e) {
+    @ExceptionHandler(UserExistsException.class)
+    public ResponseEntity<String> handleEntityAlreadyExists(UserExistsException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
 
-    @ExceptionHandler(AppUserNotFoundException.class)
-    public ResponseEntity<String> handleEntityNotFound(AppUserNotFoundException e) {
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<String> handleEntityNotFound(UserNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 
-    @ExceptionHandler(AppUserAuthException.class)
-    public ResponseEntity<String> handleAuthenticationFailed(AppUserAuthException e) {
+    @ExceptionHandler(AuthException.class)
+    public ResponseEntity<String> handleAuthenticationFailed(AuthException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<String> handleOauth2Exception(Oauth2Exception e) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
     }
 

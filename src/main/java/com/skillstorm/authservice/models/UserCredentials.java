@@ -31,6 +31,10 @@ public class UserCredentials implements UserDetails {
 
     @Column(name = "user_password")
     private String password;
+
+    @Column(name = "oauth2_idp")
+    private String oauth2Idp;
+
     private String userRole;
 
     @Override
