@@ -5,9 +5,9 @@ spring:
   application:
     name: auth-service
   datasource:
-    url: ${PG_DB_URL}/budgetbuddy-auth
-    username: ${PG_DB_USER}
-    password: ${PG_DB_PW}
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USER}
+    password: ${DATABASE_PASS}
   output:
     ansi:
       enabled: ALWAYS
