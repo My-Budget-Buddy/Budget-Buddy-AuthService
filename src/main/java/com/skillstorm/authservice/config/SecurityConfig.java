@@ -45,25 +45,18 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/").permitAll();
-                    auth.requestMatchers("/auth/register").permitAll();
-                    auth.requestMatchers("/auth/login").permitAll();
-                    auth.requestMatchers("/error/**").permitAll();
                     // The OAuth2 login endpoint is authenticated so that it redirects to the authorization server.
                     auth.requestMatchers("/auth/login/oauth2").authenticated();
+                    auth.requestMatchers("/**").permitAll();
                 });
 
         http
                 .csrf((csrf) -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .ignoringRequestMatchers("/")
-                        .ignoringRequestMatchers("/auth/register")
-                        .ignoringRequestMatchers("/auth/login")
-                        .ignoringRequestMatchers("/error/**")
+                        .ignoringRequestMatchers("/**")
                 );
 
         http.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
-        // http.oauth2Login(oauth2 -> oauth2.redirectionEndpoint(redirect -> redirect.baseUri("/login/oauth2/code/*")));
         http.oauth2Login(Customizer.withDefaults());
 
         // Treat stateless JWTs and OAuth2 social sessions differently.

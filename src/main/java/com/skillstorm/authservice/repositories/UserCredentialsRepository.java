@@ -7,10 +7,12 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface AuthRepository extends JpaRepository<UserCredentials, Long> {
+public interface UserCredentialsRepository extends JpaRepository<UserCredentials, Integer> {
 
     Optional<UserCredentials> findByUsername(String username);
 
     boolean existsByUsername(String username);
+
+    Long findIdByUsername(String email);
 
 }

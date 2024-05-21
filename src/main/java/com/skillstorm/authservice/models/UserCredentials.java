@@ -24,7 +24,7 @@ public class UserCredentials implements UserDetails {
             allocationSize = 1
     )
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_credentials_id_seq")
-    private Long id;
+    private Integer id;
 
     @Column(unique = true)
     private String username;

@@ -3,10 +3,13 @@ package com.skillstorm.authservice.controllers;
 import com.skillstorm.authservice.exceptions.UserExistsException;
 import com.skillstorm.authservice.exceptions.AuthException;
 import com.skillstorm.authservice.exceptions.UserNotFoundException;
+import com.skillstorm.authservice.models.JwtValidationDto;
 import com.skillstorm.authservice.models.UserLoginDto;
 import com.skillstorm.authservice.models.UserCredentialsDto;
 import com.skillstorm.authservice.services.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.web.bind.annotation.*;
@@ -36,6 +39,16 @@ public class AuthController {
     @GetMapping("/login/oauth2")
     public RedirectView oauth2SocialLogin(Authentication auth, HttpServletResponse response) {
         return authService.oauth2Login(auth, response);
+    }
+
+    @GetMapping("/validate")
+    public ResponseEntity<JwtValidationDto> validateJwt(Authentication auth) {
+        JwtValidationDto dto = new JwtValidationDto();
+        dto.setJwtSubject(auth.getName());
+        dto.setJwtClaim(auth.getAuthorities().toString());
+
+        // Spring Security decodes the JWT; if it's invalid, return a 401 UNAUTHORIZED.
+        return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 
 }

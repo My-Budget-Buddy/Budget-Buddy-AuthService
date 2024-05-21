@@ -9,10 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserCredentialsDto {
+public class JwtValidationDto {
 
-    private Integer id;
-    private String username;
-    private String password;
+    private String jwtSubject;
+    private String jwtClaim;
 
 }

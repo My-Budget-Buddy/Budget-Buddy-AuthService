@@ -1,19 +1,17 @@
 package com.skillstorm.authservice.services;
 
-import com.skillstorm.authservice.repositories.AuthRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.skillstorm.authservice.repositories.UserCredentialsRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final AuthRepository userRepository;
+    private final UserCredentialsRepository userRepository;
 
-    public CustomUserDetailsService(AuthRepository userRepository) {
+    public CustomUserDetailsService(UserCredentialsRepository userRepository) {
         this.userRepository = userRepository;
     }
 
