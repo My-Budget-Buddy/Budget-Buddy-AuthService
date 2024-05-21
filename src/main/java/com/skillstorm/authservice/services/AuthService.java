@@ -12,6 +12,7 @@ import com.skillstorm.authservice.utils.enums.UserRole;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
@@ -28,6 +29,7 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 @Service
 public class AuthService {
@@ -37,6 +39,7 @@ public class AuthService {
     private final AuthenticationManager authManager;
     private final TokenService tokenService;
     private final LoadBalancerClient loadBalancerClient;
+    private final DiscoveryClient discoveryClient;
     private final RestClient restClient;
     
     public AuthService(
@@ -44,12 +47,14 @@ public class AuthService {
             PasswordEncoder passwordEncoder,
             AuthenticationManager authManager,
             TokenService tokenService,
-            LoadBalancerClient loadBalancerClient) {
+            LoadBalancerClient loadBalancerClient,
+            DiscoveryClient discoveryClient) {
         this.userCredentialsRepository = userCredentialsRepository;
         this.passwordEncoder = passwordEncoder;
         this.authManager = authManager;
         this.tokenService = tokenService;
         this.loadBalancerClient = loadBalancerClient;
+        this.discoveryClient = discoveryClient;
         this.restClient = RestClient.builder()
                 .build();
     }
@@ -154,7 +159,9 @@ public class AuthService {
     // HTTP (RestClient) communication with the User service
     public UserDto createUserInUserService(String email) {
         try {
-            ServiceInstance instance = loadBalancerClient.choose("user-service");
+            List<ServiceInstance> instances = discoveryClient.getInstances("user-service");
+            ServiceInstance instance = instances.stream().findAny().orElseThrow(() -> new IllegalStateException("No user-service instance available"));
+            // ServiceInstance instance = loadBalancerClient.choose("user-service");
             UserDto userDto = UserDto.builder()
                     .email(email)
                     .build();
@@ -169,7 +176,7 @@ public class AuthService {
                         .retrieve()
                         .body(new ParameterizedTypeReference<>() {});
             } else {
-                throw new IllegalStateException("No instances available for user-service");
+                throw new IllegalStateException("No user-service instance available");
             }
         } catch (HttpClientErrorException e) {
             throw new RuntimeException(e.getMessage());
