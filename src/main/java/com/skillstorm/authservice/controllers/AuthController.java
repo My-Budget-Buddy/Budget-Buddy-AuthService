@@ -45,20 +45,18 @@ public class AuthController {
         return authService.oauth2Login(auth, response);
     }
 
+    // Endpoint to validate a JWT if any services require it.
     @GetMapping("/validate")
-    public ResponseEntity<JwtValidationDto> validateJwt(Authentication auth) {
+    public ResponseEntity<JwtValidationDto> validateJwt(@RequestHeader(name = "Authorization") String header, Authentication auth) {
+        String token = header.substring(7);
+        String userId = authService.getJwtClaim(token);
+
         JwtValidationDto dto = new JwtValidationDto();
         dto.setJwtSubject(auth.getName());
-        dto.setJwtClaim(auth.getAuthorities().toString());
+        dto.setJwtClaim("userId: " + userId);
 
         // Spring Security decodes the JWT; if it's invalid, return a 401 UNAUTHORIZED.
         return new ResponseEntity<>(dto, HttpStatus.OK);
-    }
-
-    @GetMapping("/test")
-    public String testIdClaim(@RequestHeader(name = "Authorization") String header) {
-        String token = header.substring(7);
-        return authService.getJwtClaim(token);
     }
 
 }
