@@ -159,15 +159,13 @@ public class AuthService {
     // HTTP (RestClient) communication with the User service
     public UserDto createUserInUserService(String email) {
         try {
-            List<ServiceInstance> instances = discoveryClient.getInstances("user-service");
-            ServiceInstance instance = instances.stream().findAny().orElseThrow(() -> new IllegalStateException("No user-service instance available"));
-            // ServiceInstance instance = loadBalancerClient.choose("user-service");
+            ServiceInstance instance = loadBalancerClient.choose("user-service");
             UserDto userDto = UserDto.builder()
                     .email(email)
                     .build();
 
             if (instance != null) {
-                String serviceUrl = instance.getUri().toString();
+                String serviceUrl = instance.getUri().toString().concat("/users");
 
                 return restClient.post()
                         .uri(serviceUrl)
