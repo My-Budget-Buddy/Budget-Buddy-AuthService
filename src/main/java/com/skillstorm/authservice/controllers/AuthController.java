@@ -22,7 +22,6 @@ import org.springframework.web.servlet.view.RedirectView;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin // TODO: Determine CORS origins
 public class AuthController {
 
     private final AuthService authService;
