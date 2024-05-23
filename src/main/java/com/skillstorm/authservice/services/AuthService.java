@@ -97,12 +97,17 @@ public class AuthService {
      *  - TokenService generates the JWT
      *  - Send JWT to frontend so it can store it and be logged in
      */
-    public UserLoginDto login(String username, String password) throws AuthException {
+    public UserLoginDto login(String username, String password, HttpServletResponse response) throws AuthException {
         try {
             Authentication auth = authManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password)
             );
             String token = tokenService.generateJwt(auth);
+
+            Cookie cookie = new Cookie("jwt", token);
+            cookie.setHttpOnly(false);
+            cookie.setPath("/");
+            response.addCookie(cookie);
 
             return UserLoginDto.builder()
                     .jwt(token)
@@ -124,8 +129,8 @@ public class AuthService {
             String email = oauthToken.getPrincipal().getAttribute("email");
             findOrCreateUser(email);
 
-            String jwt = tokenService.generateJwt(auth);
-            Cookie cookie = new Cookie("jwt", jwt);
+            String token = tokenService.generateJwt(auth);
+            Cookie cookie = new Cookie("jwt", token);
             cookie.setHttpOnly(false);
             cookie.setPath("/");
             response.addCookie(cookie);
@@ -137,10 +142,6 @@ public class AuthService {
         }
     }
 
-    public Long findIdByUsername(String email) {
-        return userCredentialsRepository.findIdByUsername(email);
-    }
-
     public void findOrCreateUser(String email) {
         // Users who register using OAuth2 don't have a password to store
         if (userCredentialsRepository.findByUsername(email).isEmpty()) {
@@ -150,10 +151,12 @@ public class AuthService {
             user.setUserRole(String.valueOf(UserRole.USER));
             userCredentialsRepository.save(user);
 
-            // TODO: Send request to User service to create a new User
-            // In case the IDs ever diverge, be sure to return the ID from the User db to the frontend
-            // Other services communicate with the User service, so its ID should be the source of truth
+            createUserInUserService(email);
         }
+    }
+
+    public String getJwtClaim(String token) {
+        return tokenService.decodeJwt(token);
     }
 
     // HTTP (RestClient) communication with the User service

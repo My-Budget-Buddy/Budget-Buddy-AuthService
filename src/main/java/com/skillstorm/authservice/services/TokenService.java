@@ -1,15 +1,15 @@
 package com.skillstorm.authservice.services;
 
+import com.skillstorm.authservice.repositories.UserCredentialsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.oauth2.jwt.JwtClaimsSet;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -17,10 +17,12 @@ public class TokenService {
 
     private final JwtEncoder jwtEncoder;
     private final JwtDecoder jwtDecoder;
+    private final UserCredentialsRepository userCredentialsRepository;
 
-    public TokenService(JwtEncoder jwtEncoder, JwtDecoder jwtDecoder) {
+    public TokenService(JwtEncoder jwtEncoder, JwtDecoder jwtDecoder, UserCredentialsRepository userCredentialsRepository) {
         this.jwtEncoder = jwtEncoder;
         this.jwtDecoder = jwtDecoder;
+        this.userCredentialsRepository = userCredentialsRepository;
     }
 
     public String generateJwt(Authentication auth) {
@@ -32,17 +34,25 @@ public class TokenService {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(" "));
 
+        Optional<Integer> userIdMaybe = userCredentialsRepository.findIdByUsername(auth.getName());
+        Integer userId = userIdMaybe.orElseThrow();
+
         // JWT claim set: The info the token holds. subject = username, claim = roles.
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("self")
                 .issuedAt(now)
                 .subject(auth.getName())
-                .claim("roles", scope)
+                .claim("userId", userId.toString())
                 .expiresAt(now.plusSeconds(86400)) // 24-hour expiration.
                 .build();
 
         // Build the JWT token.
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+    }
+
+    public String decodeJwt(String token) {
+        Jwt decodedJwt = jwtDecoder.decode(token);
+        return decodedJwt.getClaim("userId");
     }
 
 }
