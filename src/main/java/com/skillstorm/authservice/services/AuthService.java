@@ -95,7 +95,7 @@ public class AuthService {
             Authentication auth = authManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password)
             );
-            String token = tokenService.generateJwt(auth);
+            String token = tokenService.generateJwt(auth, username);
 
             Cookie cookie = new Cookie("jwt", token);
             cookie.setHttpOnly(false);
@@ -115,10 +115,10 @@ public class AuthService {
             OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) auth;
 
             // If the user doesn't exist, register by saving the name and authorization provider in the db
-            String email = oauthToken.getPrincipal().getAttribute("email");
-            findOrCreateUser(email);
+            String username = oauthToken.getPrincipal().getAttribute("email");
+            findOrCreateUser(username);
 
-            String token = tokenService.generateJwt(auth);
+            String token = tokenService.generateJwt(auth, username);
             Cookie cookie = new Cookie("jwt", token);
             cookie.setHttpOnly(false);
             cookie.setPath("/");
@@ -131,13 +131,15 @@ public class AuthService {
         }
     }
 
-    public void findOrCreateUser(String email) {
+    public void findOrCreateUser(String username) {
+
         // Users who register using OAuth2 don't have a password to store
-        if (userCredentialsRepository.findByUsername(email).isEmpty()) {
-            UserCredentials newUser = new UserCredentials();
-            newUser.setUsername(email);
-            newUser.setOauth2Idp(String.valueOf(Oauth2AuthorizationServer.GOOGLE));
-            newUser.setUserRole(String.valueOf(UserRole.USER));
+        if (userCredentialsRepository.findByUsername(username).isEmpty()) {
+            UserCredentials newUser = UserCredentials.builder()
+                    .username(username)
+                    .oauth2Idp(String.valueOf(Oauth2AuthorizationServer.GOOGLE))
+                    .userRole(String.valueOf(UserRole.USER))
+                    .build();
 
             UserCredentials savedUser = userCredentialsRepository.save(newUser);
             createUserInUserService(savedUser.getId(), newUser.getUsername());

@@ -36,7 +36,6 @@ public class SecurityConfig {
 
     private final RsaKeyProperties keys;
 
-    @Autowired
     public SecurityConfig(RsaKeyProperties keys) {
         this.keys = keys;
     }

@@ -25,7 +25,7 @@ public class TokenService {
         this.userCredentialsRepository = userCredentialsRepository;
     }
 
-    public String generateJwt(Authentication auth) {
+    public String generateJwt(Authentication auth, String username) {
         // Take a snapshot of the time.
         Instant now = Instant.now();
 
@@ -34,7 +34,7 @@ public class TokenService {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(" "));
 
-        Optional<Integer> userIdMaybe = userCredentialsRepository.findIdByUsername(auth.getName());
+        Optional<Integer> userIdMaybe = userCredentialsRepository.findIdByUsername(username);
         Integer userId = userIdMaybe.orElseThrow();
 
         // JWT claim set: The info the token holds. subject = username, claim = roles.

@@ -16,6 +16,6 @@ public interface UserCredentialsRepository extends JpaRepository<UserCredentials
     boolean existsByUsername(String username);
 
     @Query("SELECT u.id FROM UserCredentials u WHERE u.username = ?1")
-    Optional<Integer> findIdByUsername(String email);
+    Optional<Integer> findIdByUsername(String username);
 
 }
