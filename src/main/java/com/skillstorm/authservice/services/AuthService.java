@@ -15,7 +15,9 @@ import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -59,7 +61,7 @@ public class AuthService {
                 .build();
     }
 
-    public UserCredentialsDto register(String username, String password) throws UserExistsException {
+    public void register(String username, String password) throws UserExistsException {
         try {
             if (userCredentialsRepository.existsByUsername(username)) {
                 throw new UserExistsException("That username is not available.");
@@ -72,18 +74,9 @@ public class AuthService {
                     .userRole("USER")
                     .build();
 
-            userCredentialsRepository.save(newUser);
-            UserDto userDto = createUserInUserService(username);
+            UserCredentials savedUser = userCredentialsRepository.save(newUser);
+            createUserInUserService(savedUser.getId(), username);
 
-            // In case the IDs ever diverge, return the ID from the User db to the frontend
-            // Other services communicate with the User service, so its ID should be the source of truth
-            Integer userServiceId = userDto.getId();
-
-            return UserCredentialsDto.builder()
-                    .id(userServiceId)
-                    .username(newUser.getUsername())
-                    .password("Hashed and saved in db")
-                    .build();
         } catch (UserExistsException e) {
             throw new UserExistsException("That username is not available.");
         } catch (Exception e) {
@@ -92,12 +85,12 @@ public class AuthService {
     }
 
     /*
-     *  - Find & authenticate a username & password using the AuthenticationManager
+     *  - Find & authenticate a username/password using the AuthenticationManager implementation
      *  - Generate a token to send to TokenService
      *  - TokenService generates the JWT
      *  - Send JWT to frontend so it can store it and be logged in
      */
-    public UserLoginDto login(String username, String password, HttpServletResponse response) throws AuthException {
+    public void login(String username, String password, HttpServletResponse response) throws AuthException {
         try {
             Authentication auth = authManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password)
@@ -108,10 +101,6 @@ public class AuthService {
             cookie.setHttpOnly(false);
             cookie.setPath("/");
             response.addCookie(cookie);
-
-            return UserLoginDto.builder()
-                    .jwt(token)
-                    .build();
         } catch (AuthenticationException e) {
             throw new AuthException("User not found or bad credentials.");
         }
@@ -145,13 +134,13 @@ public class AuthService {
     public void findOrCreateUser(String email) {
         // Users who register using OAuth2 don't have a password to store
         if (userCredentialsRepository.findByUsername(email).isEmpty()) {
-            UserCredentials user = new UserCredentials();
-            user.setUsername(email);
-            user.setOauth2Idp(String.valueOf(Oauth2AuthorizationServer.GOOGLE));
-            user.setUserRole(String.valueOf(UserRole.USER));
-            userCredentialsRepository.save(user);
+            UserCredentials newUser = new UserCredentials();
+            newUser.setUsername(email);
+            newUser.setOauth2Idp(String.valueOf(Oauth2AuthorizationServer.GOOGLE));
+            newUser.setUserRole(String.valueOf(UserRole.USER));
 
-            createUserInUserService(email);
+            UserCredentials savedUser = userCredentialsRepository.save(newUser);
+            createUserInUserService(savedUser.getId(), newUser.getUsername());
         }
     }
 
@@ -160,17 +149,18 @@ public class AuthService {
     }
 
     // HTTP (RestClient) communication with the User service
-    public UserDto createUserInUserService(String email) {
+    public void createUserInUserService(Integer id, String email) {
         try {
             ServiceInstance instance = loadBalancerClient.choose("user-service");
             UserDto userDto = UserDto.builder()
+                    .id(id)
                     .email(email)
                     .build();
 
             if (instance != null) {
                 String serviceUrl = instance.getUri().toString().concat("/users");
 
-                return restClient.post()
+                restClient.post()
                         .uri(serviceUrl)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(userDto)

@@ -31,13 +31,15 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public UserCredentialsDto registerUser(@RequestBody UserCredentialsDto body) throws UserExistsException {
-        return authService.register(body.getUsername(), body.getPassword());
+    public ResponseEntity<Object> registerUser(@RequestBody UserCredentialsDto body) throws UserExistsException {
+        authService.register(body.getUsername(), body.getPassword());
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
-    public UserLoginDto loginUser(@RequestBody UserCredentialsDto body, HttpServletResponse response) throws UserNotFoundException, AuthException {
-        return authService.login(body.getUsername(), body.getPassword(), response);
+    public ResponseEntity<Object> loginUser(@RequestBody UserCredentialsDto body, HttpServletResponse response) throws UserNotFoundException, AuthException {
+        authService.login(body.getUsername(), body.getPassword(), response);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/login/oauth2")
