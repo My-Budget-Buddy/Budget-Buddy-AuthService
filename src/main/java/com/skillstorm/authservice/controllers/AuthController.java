@@ -37,9 +37,8 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Object> loginUser(@RequestBody UserCredentialsDto body, HttpServletResponse response) throws UserNotFoundException, AuthException {
-        authService.login(body.getUsername(), body.getPassword(), response);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<UserCredentialsDto> loginUser(@RequestBody UserCredentialsDto body, HttpServletResponse response) throws UserNotFoundException, AuthException {
+        return new ResponseEntity<>(authService.login(body.getUsername(), body.getPassword(), response), HttpStatus.OK);
     }
 
     @GetMapping("/login/oauth2")
@@ -47,7 +46,7 @@ public class AuthController {
         return authService.oauth2Login(auth, response);
     }
 
-    // Endpoint to validate a JWT if any services require it.
+    // Endpoint to validate a JWT and return the user ID embedded in it for the Gateway.
     @GetMapping("/validate")
     public ResponseEntity<JwtValidationDto> validateJwt(@RequestHeader(name = "Authorization") String header, Authentication auth) {
         String token = header.substring(7);
@@ -55,7 +54,7 @@ public class AuthController {
 
         JwtValidationDto dto = new JwtValidationDto();
         dto.setJwtSubject(auth.getName());
-        dto.setJwtClaim("userId: " + userId);
+        dto.setJwtClaim(userId);
 
         // Spring Security decodes the JWT; if it's invalid, return a 401 UNAUTHORIZED.
         return new ResponseEntity<>(dto, HttpStatus.OK);

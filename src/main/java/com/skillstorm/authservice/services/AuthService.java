@@ -32,6 +32,7 @@ import org.springframework.web.servlet.view.RedirectView;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AuthService {
@@ -41,7 +42,6 @@ public class AuthService {
     private final AuthenticationManager authManager;
     private final TokenService tokenService;
     private final LoadBalancerClient loadBalancerClient;
-    private final DiscoveryClient discoveryClient;
     private final RestClient restClient;
     
     public AuthService(
@@ -49,14 +49,12 @@ public class AuthService {
             PasswordEncoder passwordEncoder,
             AuthenticationManager authManager,
             TokenService tokenService,
-            LoadBalancerClient loadBalancerClient,
-            DiscoveryClient discoveryClient) {
+            LoadBalancerClient loadBalancerClient) {
         this.userCredentialsRepository = userCredentialsRepository;
         this.passwordEncoder = passwordEncoder;
         this.authManager = authManager;
         this.tokenService = tokenService;
         this.loadBalancerClient = loadBalancerClient;
-        this.discoveryClient = discoveryClient;
         this.restClient = RestClient.builder()
                 .build();
     }
@@ -76,7 +74,6 @@ public class AuthService {
 
             UserCredentials savedUser = userCredentialsRepository.save(newUser);
             createUserInUserService(savedUser.getId(), username);
-
         } catch (UserExistsException e) {
             throw new UserExistsException("That username is not available.");
         } catch (Exception e) {
@@ -90,17 +87,27 @@ public class AuthService {
      *  - TokenService generates the JWT
      *  - Send JWT to frontend so it can store it and be logged in
      */
-    public void login(String username, String password, HttpServletResponse response) throws AuthException {
+    public UserCredentialsDto login(String username, String password, HttpServletResponse response) throws AuthException {
         try {
             Authentication auth = authManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password)
             );
+            Optional<UserCredentials> foundUser = userCredentialsRepository.findByUsername(username);
+
+            // Get the user from the Optional or throw a NoSuchElementException.
+            UserCredentials user = foundUser.orElseThrow();
+
             String token = tokenService.generateJwt(auth, username);
 
             Cookie cookie = new Cookie("jwt", token);
             cookie.setHttpOnly(false);
             cookie.setPath("/");
             response.addCookie(cookie);
+
+            return UserCredentialsDto.builder()
+                    .id(user.getId())
+                    .username(user.getUsername())
+                    .build();
         } catch (AuthenticationException e) {
             throw new AuthException("User not found or bad credentials.");
         }

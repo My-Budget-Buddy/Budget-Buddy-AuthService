@@ -8,6 +8,7 @@ import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -43,7 +44,7 @@ public class TokenService {
                 .issuedAt(now)
                 .subject(auth.getName())
                 .claim("userId", userId.toString())
-                .expiresAt(now.plusSeconds(86400)) // 24-hour expiration.
+                .expiresAt(now.plus(2, ChronoUnit.HOURS))
                 .build();
 
         // Build the JWT token.
