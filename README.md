@@ -105,8 +105,7 @@ mvn test
 - **Response (200 OK)**:
     ```javascript
       {
-        "username": "newuser@email.com",
-        "password": null
+        "username": "newuser@email.com"
       }
     ```
 
