@@ -85,7 +85,7 @@ mvn test
 - **Request**:
     ```javascript
     {
-      "username": newuser@email.com
+      "username": "newuser@email.com"
       "password": "correcthorsebatterystaple"
     }
     ```
@@ -98,7 +98,7 @@ mvn test
 - **Request**:
     ```javascript
     {
-      "username": newuser@email.com
+      "username": "newuser@email.com"
       "password": "correcthorsebatterystaple"
     }
     ```
