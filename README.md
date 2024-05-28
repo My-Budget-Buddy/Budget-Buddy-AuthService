@@ -108,6 +108,7 @@ mvn test
         "username": "newuser@email.com"
       }
     ```
+    In addition, a cookie called "jwt" containing the JWT is created.
 
 #### Login with OAuth2
 - **URL**: ```GET /auth/login/oauth2```
@@ -128,9 +129,9 @@ mvn test
 
 #### Logout
 - **URL**: ```GET /auth/logout}```
-- **Description**: Log out by deleting the JWT stored as a cookie and closing any active sessions on the server.
+- **Description**: Log out by deleting the JWT and closing any active sessions on the server.
 - **Response (200 OK)**:
-    Redirect to the home page.
+    Redirect to the home page. The "jwt" cookie is deleted.
 
 ## Built With
 ![](https://img.shields.io/badge/-Java-007396?style=flat-square&logo=java&logoColor=white)
