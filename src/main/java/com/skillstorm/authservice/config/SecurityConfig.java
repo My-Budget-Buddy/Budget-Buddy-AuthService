@@ -48,7 +48,7 @@ public class SecurityConfig {
                     auth.requestMatchers("/auth/login/oauth2").authenticated();
                     auth.requestMatchers("/**").permitAll();
                 })
-                .logout(logout -> logout.deleteCookies("jwt", "JESSIONID").invalidateHttpSession(true)
+                .logout(logout -> logout.deleteCookies("jwt", "JSESSIONID").invalidateHttpSession(true)
                     .logoutUrl("/auth/logout")
                     .logoutSuccessUrl("/auth/logout/redirect")
                 );
