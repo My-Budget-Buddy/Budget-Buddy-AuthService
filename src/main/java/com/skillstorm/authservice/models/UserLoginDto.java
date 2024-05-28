@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class UserLoginDto {
 
-    private String jwt;
+    private String username;
 
 }

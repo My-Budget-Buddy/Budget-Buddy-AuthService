@@ -37,13 +37,18 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserCredentialsDto> loginUser(@RequestBody UserCredentialsDto body, HttpServletResponse response) throws UserNotFoundException, AuthException {
+    public ResponseEntity<UserLoginDto> loginUser(@RequestBody UserCredentialsDto body, HttpServletResponse response) throws UserNotFoundException, AuthException {
         return new ResponseEntity<>(authService.login(body.getUsername(), body.getPassword(), response), HttpStatus.OK);
     }
 
     @GetMapping("/login/oauth2")
     public RedirectView oauth2SocialLogin(Authentication auth, HttpServletResponse response) {
         return authService.oauth2Login(auth, response);
+    }
+
+    @GetMapping("/logout/redirect")
+    public RedirectView logout() {
+        return new RedirectView("https://frontend.skillstorm-congo.com/");
     }
 
     // Endpoint to validate a JWT and return the user ID embedded in it for the Gateway.

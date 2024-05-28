@@ -10,6 +10,7 @@ import com.skillstorm.authservice.repositories.UserCredentialsRepository;
 import com.skillstorm.authservice.utils.enums.Oauth2AuthorizationServer;
 import com.skillstorm.authservice.utils.enums.UserRole;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -72,6 +73,11 @@ public class AuthService {
                     .userRole("USER")
                     .build();
 
+            // Check if an instance of the User service is available before save() to make this operation more atomic
+            if (!checkForUserServiceInstance()) {
+                throw new IllegalStateException("User not registered. No instance of user-service available");
+            }
+
             UserCredentials savedUser = userCredentialsRepository.save(newUser);
             createUserInUserService(savedUser.getId(), username);
         } catch (UserExistsException e) {
@@ -87,7 +93,7 @@ public class AuthService {
      *  - TokenService generates the JWT
      *  - Send JWT to frontend so it can store it and be logged in
      */
-    public UserCredentialsDto login(String username, String password, HttpServletResponse response) throws AuthException {
+    public UserLoginDto login(String username, String password, HttpServletResponse response) throws AuthException {
         try {
             Authentication auth = authManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password)
@@ -104,8 +110,7 @@ public class AuthService {
             cookie.setPath("/");
             response.addCookie(cookie);
 
-            return UserCredentialsDto.builder()
-                    .id(user.getId())
+            return UserLoginDto.builder()
                     .username(user.getUsername())
                     .build();
         } catch (AuthenticationException e) {
@@ -115,8 +120,8 @@ public class AuthService {
 
     public RedirectView oauth2Login(Authentication auth, HttpServletResponse response) {
         try {
-            // Redirect URL is still TBD
-            RedirectView redirectView = new RedirectView("/");
+            // Redirect URL is still TBD; want to redirect to homepage
+            RedirectView redirectView = new RedirectView("https://frontend.skillstorm-congo.com/");
             redirectView.setContextRelative(true);
 
             OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) auth;
@@ -139,7 +144,6 @@ public class AuthService {
     }
 
     public void findOrCreateUser(String username) {
-
         // Users who register using OAuth2 don't have a password to store
         if (userCredentialsRepository.findByUsername(username).isEmpty()) {
             UserCredentials newUser = UserCredentials.builder()
@@ -155,6 +159,13 @@ public class AuthService {
 
     public String getJwtClaim(String token) {
         return tokenService.decodeJwt(token);
+    }
+
+    // Check if there is an instance of the User service available
+    public boolean checkForUserServiceInstance() {
+        ServiceInstance instance = loadBalancerClient.choose("user-service");
+
+        return instance != null;
     }
 
     // HTTP (RestClient) communication with the User service

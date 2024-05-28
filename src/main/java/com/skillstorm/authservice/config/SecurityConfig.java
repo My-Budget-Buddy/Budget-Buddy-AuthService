@@ -47,7 +47,11 @@ public class SecurityConfig {
                     // The OAuth2 login endpoint is authenticated so that it redirects to the authorization server.
                     auth.requestMatchers("/auth/login/oauth2").authenticated();
                     auth.requestMatchers("/**").permitAll();
-                });
+                })
+                .logout(logout -> logout.deleteCookies("jwt", "JESSIONID").invalidateHttpSession(true)
+                    .logoutUrl("/auth/logout")
+                    .logoutSuccessUrl("/auth/logout/redirect")
+                );
 
         http
                 .csrf((csrf) -> csrf
