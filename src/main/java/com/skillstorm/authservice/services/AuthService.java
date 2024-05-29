@@ -110,10 +110,12 @@ public class AuthService {
             Cookie cookie = new Cookie("jwt", token);
             cookie.setHttpOnly(false);
             cookie.setPath("/");
+            cookie.setDomain("skillstorm-congo.com");
             response.addCookie(cookie);
 
             return UserLoginDto.builder()
                     .username(user.getUsername())
+                    .jwt(token)
                     .build();
         } catch (AuthenticationException e) {
             throw new AuthException("User not found or bad credentials.");
@@ -136,6 +138,7 @@ public class AuthService {
             Cookie cookie = new Cookie("jwt", token);
             cookie.setHttpOnly(false);
             cookie.setPath("/");
+            cookie.setDomain("skillstorm-congo.com");
             response.addCookie(cookie);
 
             return redirectView;
