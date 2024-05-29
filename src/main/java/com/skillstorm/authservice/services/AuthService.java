@@ -13,6 +13,7 @@ import com.skillstorm.authservice.utils.enums.UserRole;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
@@ -45,7 +46,7 @@ public class AuthService {
     private final TokenService tokenService;
     private final LoadBalancerClient loadBalancerClient;
     private final RestClient restClient;
-    
+
     public AuthService(
             UserCredentialsRepository userCredentialsRepository,
             PasswordEncoder passwordEncoder,
@@ -201,7 +202,8 @@ public class AuthService {
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(userDto)
                         .retrieve()
-                        .body(new ParameterizedTypeReference<>() {});
+                        .body(new ParameterizedTypeReference<>() {
+                        });
             } else {
                 throw new IllegalStateException("No user-service instance available");
             }
@@ -209,7 +211,5 @@ public class AuthService {
             throw new RuntimeException(e.getMessage());
         }
     }
-
-
 
 }
