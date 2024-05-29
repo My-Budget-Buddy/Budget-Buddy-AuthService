@@ -5,9 +5,9 @@ spring:
   application:
     name: auth-service
   datasource:
-    url: ${DATABASE_URL}
-    username: ${DATABASE_USER}
-    password: ${DATABASE_PASS}
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/auth-users}
+    username: ${DATABASE_USER:postgres}
+    password: ${DATABASE_PASS:postgres}
   output:
     ansi:
       enabled: ALWAYS
@@ -20,9 +20,9 @@ spring:
               client-secret: ${GOOGLE_CLIENT_SECRET}
 
 # For testing only!
-#  jpa:
-#    hibernate:
-#      ddl-auto: update
+  jpa:
+    hibernate:
+      ddl-auto: update
 
 eureka:
   client:
@@ -30,3 +30,13 @@ eureka:
       defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
   instance:
     leaseRenewalIntervalSeconds: 30
+
+# creating the rabbitmq fanout exchange
+exchanges:
+    fanout: delete-user
+
+queues:
+    fanout: deleteUserQueue
+
+# creating the routing key for the exchange
+routing-key: key1234

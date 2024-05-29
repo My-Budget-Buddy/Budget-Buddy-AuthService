@@ -12,6 +12,7 @@ import com.skillstorm.authservice.utils.enums.UserRole;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
@@ -19,6 +20,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -192,6 +194,15 @@ public class AuthService {
         } catch (HttpClientErrorException e) {
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+    public void deleteUserById(int id) {
+        userCredentialsRepository.deleteById(id);
+    }
+
+    @RabbitListener(queues = "${queues.fanout}")
+    public void receiveDeleteByUserId(@Payload int userId) {
+        deleteUserById(userId);
     }
 
 }
