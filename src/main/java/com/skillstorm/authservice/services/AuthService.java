@@ -2,6 +2,7 @@ package com.skillstorm.authservice.services;
 
 import com.skillstorm.authservice.exceptions.UserExistsException;
 import com.skillstorm.authservice.exceptions.AuthException;
+import com.skillstorm.authservice.exceptions.UserNotFoundException;
 import com.skillstorm.authservice.models.UserCredentials;
 import com.skillstorm.authservice.models.UserCredentialsDto;
 import com.skillstorm.authservice.models.UserDto;
@@ -143,6 +144,21 @@ public class AuthService {
         }
     }
 
+    public String updatePassword(String username, String password) {
+        try {
+            UserCredentials user = userCredentialsRepository.findByUsername(username)
+                    .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+            String encodedPassword = passwordEncoder.encode(password);
+            user.setPassword(encodedPassword);
+
+            userCredentialsRepository.save(user);
+            return "Password updated!";
+        } catch (UserNotFoundException e) {
+            return "User not found";
+        }
+    }
+
     public void findOrCreateUser(String username) {
         // Users who register using OAuth2 don't have a password to store
         if (userCredentialsRepository.findByUsername(username).isEmpty()) {
@@ -193,5 +209,7 @@ public class AuthService {
             throw new RuntimeException(e.getMessage());
         }
     }
+
+
 
 }

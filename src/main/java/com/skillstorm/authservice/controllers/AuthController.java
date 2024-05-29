@@ -51,6 +51,11 @@ public class AuthController {
         return new RedirectView("https://frontend.skillstorm-congo.com/");
     }
 
+    @PutMapping("/update/password")
+    public ResponseEntity<String> updatePassword(@RequestBody UserCredentialsDto body) throws UserExistsException {
+        return new ResponseEntity<>(authService.updatePassword(body.getUsername(), body.getPassword()), HttpStatus.OK);
+    }
+
     // Endpoint to validate a JWT and return the user ID embedded in it for the Gateway.
     @GetMapping("/validate")
     public ResponseEntity<JwtValidationDto> validateJwt(@RequestHeader(name = "Authorization") String header, Authentication auth) {

@@ -46,6 +46,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> {
                     // The OAuth2 login endpoint is authenticated so that it redirects to the authorization server.
                     auth.requestMatchers("/auth/login/oauth2").authenticated();
+                    auth.requestMatchers("/auth/update/password").authenticated();
                     auth.requestMatchers("/**").permitAll();
                 })
                 .logout(logout -> logout.deleteCookies("jwt", "JSESSIONID").invalidateHttpSession(true)
