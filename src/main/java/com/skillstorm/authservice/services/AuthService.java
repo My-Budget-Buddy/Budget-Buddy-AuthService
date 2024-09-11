@@ -113,6 +113,7 @@ public class AuthService {
 
             return UserLoginDto.builder()
                     .username(user.getUsername())
+                    .jwt(token)
                     .build();
         } catch (AuthenticationException e) {
             throw new AuthException("User not found or bad credentials.");
