@@ -15,6 +15,7 @@ public class ExceptionHandlerAdviceTests {
 
     @Test
     void testHandleEntityAlreadyExists() {
+        // Check that the response is correct for an EntityAlreadyExistsException
         String errorMessage = "User already exists";
         UserExistsException exception = new UserExistsException(errorMessage);
 
@@ -26,6 +27,7 @@ public class ExceptionHandlerAdviceTests {
 
     @Test
     void testHandleEntityNotFound() {
+        // Check that the response is correct for an EntityNotFoundException
         String errorMessage = "User not found";
         UserNotFoundException exception = new UserNotFoundException(errorMessage);
 
@@ -37,6 +39,7 @@ public class ExceptionHandlerAdviceTests {
 
     @Test
     void testHandleAuthenticationFailed() {
+        // Check that the response is correct for an AuthException
         String errorMessage = "Authentication failed";
         AuthException exception = new AuthException(errorMessage);
 
@@ -48,6 +51,7 @@ public class ExceptionHandlerAdviceTests {
 
     @Test
     void testHandleOauth2Exception() {
+        // Check that the response is correct for an Oauth2Exception
         String errorMessage = "OAuth2 authentication failed";
         Oauth2Exception exception = new Oauth2Exception(errorMessage);
 

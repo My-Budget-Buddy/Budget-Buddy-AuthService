@@ -7,6 +7,7 @@ class AuthExceptionTests {
 
     @Test
     void testAuthExceptionMessage() {
+        // Test that the exception message is set correctly
         String errorMessage = "Authentication failed";
         AuthException exception = assertThrows(AuthException.class, () -> {
             throw new AuthException(errorMessage);

@@ -17,6 +17,7 @@ public class KeyGeneratorUtilityTests {
     void testGenerateRsaKey() {
         KeyPair keyPair = KeyGeneratorUtility.generateRsaKey();
 
+        // Check that all keys are not null
         assertNotNull(keyPair, "KeyPair should not be null");
         assertNotNull(keyPair.getPrivate(), "Private key should not be null");
         assertNotNull(keyPair.getPublic(), "Public key should not be null");

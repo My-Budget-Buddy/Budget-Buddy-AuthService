@@ -35,16 +35,19 @@ public class RsaKeyPropertiesTests {
 
     @Test
     void testGetPublicKey() {
+        // Test that the public key is the same as the mock public key
         assertEquals(publicKey, rsaKeyProperties.getPublicKey());
     }
 
     @Test
     void testGetPrivateKey() {
+        // Test that the private key is the same as the mock private key
         assertEquals(privateKey, rsaKeyProperties.getPrivateKey());
     }
 
     @Test
     void testSetPublicKey() {
+        // Test that the public key can be set to a new public key
         RSAPublicKey newPublicKey = mock(RSAPublicKey.class);
         rsaKeyProperties.setPublicKey(newPublicKey);
         assertEquals(newPublicKey, rsaKeyProperties.getPublicKey());
@@ -52,6 +55,7 @@ public class RsaKeyPropertiesTests {
 
     @Test
     void testSetPrivateKey() {
+        // Test that the private key can be set to a new private key
         RSAPrivateKey newPrivateKey = mock(RSAPrivateKey.class);
         rsaKeyProperties.setPrivateKey(newPrivateKey);
         assertEquals(newPrivateKey, rsaKeyProperties.getPrivateKey());
