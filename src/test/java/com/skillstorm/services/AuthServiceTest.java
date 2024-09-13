@@ -320,7 +320,7 @@ public class AuthServiceTest {
     // }
 
     // @Test
-    // public void testOauth2LoginInvalid() {
+    // public void testOauth2LoginInvalid() {}
 
     //     authService.oauth2Login(null, httpServletResponse);
     // }
