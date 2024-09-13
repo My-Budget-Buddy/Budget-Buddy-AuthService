@@ -4,6 +4,8 @@ import com.skillstorm.authservice.models.UserCredentials;
 import com.skillstorm.authservice.repositories.UserCredentialsRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -12,6 +14,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class CustomUserDetailsServiceTest {
 
     private UserCredentialsRepository userRepository;
@@ -31,8 +34,6 @@ class CustomUserDetailsServiceTest {
         String username = "testUser";
         UserCredentials userCredentials = mock(UserCredentials.class);
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(userCredentials));
-        when(userCredentials.getUsername()).thenReturn(username);
-        when(userCredentials.getPassword()).thenReturn("password");
 
         UserDetails result = customUserDetailsService.loadUserByUsername(username);
 

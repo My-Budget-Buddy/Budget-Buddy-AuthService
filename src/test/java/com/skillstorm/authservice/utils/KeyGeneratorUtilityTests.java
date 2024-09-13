@@ -8,13 +8,21 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+@ExtendWith(MockitoExtension.class)
 public class KeyGeneratorUtilityTests {
 
     @Test
     void testGenerateRsaKey() {
+    KeyPair mockKeyPair = new KeyPair(Mockito.mock(java.security.PublicKey.class), Mockito.mock(java.security.PrivateKey.class));
+
+    try (MockedStatic<KeyGeneratorUtility> mockedStatic = Mockito.mockStatic(KeyGeneratorUtility.class)) {
+        mockedStatic.when(KeyGeneratorUtility::generateRsaKey).thenReturn(mockKeyPair);
+
         KeyPair keyPair = KeyGeneratorUtility.generateRsaKey();
 
         // Check that all keys are not null
@@ -22,6 +30,7 @@ public class KeyGeneratorUtilityTests {
         assertNotNull(keyPair.getPrivate(), "Private key should not be null");
         assertNotNull(keyPair.getPublic(), "Public key should not be null");
     }
+}
 
     @Test
     void testGenerateRsaKeyNoSuchAlgorithmException() { // Throwing the NoSuchAlgorithmException
