@@ -1,4 +1,4 @@
-package com.skillstorm.services;
+package com.skillstorm.authservice.services.unit;
 
 import java.lang.reflect.Field;
 import java.net.URI;

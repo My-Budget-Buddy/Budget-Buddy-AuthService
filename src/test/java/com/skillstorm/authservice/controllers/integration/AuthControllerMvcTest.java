@@ -1,9 +1,8 @@
-package com.skillstorm.controllers.integration;
+package com.skillstorm.authservice.controllers.integration;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
 import org.mockito.Mockito;

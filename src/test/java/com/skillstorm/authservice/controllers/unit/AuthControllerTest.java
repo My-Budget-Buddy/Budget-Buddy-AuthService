@@ -1,4 +1,4 @@
-package com.skillstorm.controllers.unit;
+package com.skillstorm.authservice.controllers.unit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
