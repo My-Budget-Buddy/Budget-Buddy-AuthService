@@ -7,6 +7,10 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
 import org.mockito.Mockito;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 
 
@@ -24,6 +28,7 @@ import com.jayway.jsonpath.JsonPath;
 import com.skillstorm.authservice.AuthServiceRunner;
 import com.skillstorm.authservice.services.AuthService;
 
+import jakarta.servlet.ServletException;
 import jakarta.transaction.Transactional;
 
 @SpringBootTest(
@@ -80,6 +85,21 @@ public class AuthControllerMvcTest {
     }
 
     @Test
+    public void testRegisterUserFailure_InvalidData() throws Exception {
+        // Attempt to register with no password defined
+        Exception exception = assertThrows(ServletException.class, () -> {
+            mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")
+                .contentType("application/json")
+                .content("{\"username\":\"" + newUser + "\"}"));
+        });
+
+        // Missing password produces "rawPassword cannot be null" error
+        Throwable exceptionCause = exception.getCause();
+        assertTrue(exceptionCause instanceof RuntimeException);
+        assertEquals("Error: rawPassword cannot be null", exceptionCause.getMessage());
+    }
+
+    @Test
     public void testLoginUserSuccess() throws Exception {
         // First, register the user
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")
@@ -97,7 +117,7 @@ public class AuthControllerMvcTest {
 
     @Test
     public void testLoginUserFailure_InvalidCredentials() throws Exception {
-        // Attempt to login without registering
+        // Attempt to login with invalid credentials
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/login")
             .contentType("application/json")
             .content("{\"username\":\"" + newUser + "\",\"password\":\"wrongPassword\"}"))
@@ -132,7 +152,35 @@ public class AuthControllerMvcTest {
     }
 
     @Test
+    public void testUpdatePasswordFailure_UserNotFound() throws Exception {
+        // Attempt to update the password of a non-existent user
+        String nonExistentUser = "nonexistentuser@validemail.com";
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")
+            .contentType("application/json")
+            .content("{\"username\":\"" + newUser + "\",\"password\":\"" + newPassword + "\"}"))
+            .andExpect(status().isCreated());
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/auth/update/password")
+            .contentType("application/json")
+            .content("{\"username\":\"" + nonExistentUser + "\",\"password\":\"" + newPassword + "\"}")
+            .with(user(nonExistentUser).roles("USER")))
+            .andExpect(status().isOk()) // Despite the user not existing, the endpoint returns 200 OK...
+            .andExpect(content().string("User not found")); // ...along with this error message
+    }
+
+    @Test
+    public void testUpdatePasswordFailure_Unauthorized() throws Exception {
+        // Endpoint should return unauthorized when user is not logged in
+        mockMvc.perform(MockMvcRequestBuilders.put("/auth/update/password")
+            .contentType("application/json")
+            .content("{\"username\":\"" + newUser + "\",\"password\":\"newpassword\"}"))
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     public void testLogoutRedirect() throws Exception {
+        // Simulate a GET request to /auth/logout/redirect, which should redirect to buddy's homepage
         mockMvc.perform(MockMvcRequestBuilders.get("/auth/logout/redirect"))
             .andExpect(status().is3xxRedirection())
             .andExpect(redirectedUrl("https://frontend.skillstorm-congo.com/"));
@@ -170,6 +218,15 @@ public class AuthControllerMvcTest {
     }
 
     @Test
+    public void testValidateJwtFailure_InvalidToken() throws Exception {
+        String invalidJwt = "invalid.jwt.token";
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/auth/validate")
+            .header("Authorization", "Bearer " + invalidJwt))
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     public void testOauth2SocialLoginSuccess() throws Exception {
         // Perform a GET request to /auth/login/oauth2 with a dummy user
         mockMvc.perform(MockMvcRequestBuilders.get("/auth/login/oauth2")
@@ -178,5 +235,13 @@ public class AuthControllerMvcTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("https://frontend.skillstorm-congo.com/"))
                 .andExpect(cookie().exists("jwt"));
+    }
+
+    @Test
+    public void testOauth2SocialLoginFailure() throws Exception {
+        // Simulate an OAuth2 login without providing necessary attributes
+        // Error: No+user-service+instance+available - returns 401 Unauthorized
+        mockMvc.perform(MockMvcRequestBuilders.get("/auth/login/oauth2"))
+            .andExpect(status().isUnauthorized());
     }
 }
