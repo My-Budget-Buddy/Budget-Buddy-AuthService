@@ -55,7 +55,6 @@ public class AuthControllerMvcTest {
     }
 
     @Test
-    @Order(1)
     public void testRegisterUserSuccess() throws Exception {
         // Simulate a POST request to /auth/register with a Json object containing a username and password
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")
@@ -65,10 +64,12 @@ public class AuthControllerMvcTest {
     }
 
     @Test
-    @Order(2)
     public void testLoginUserSuccess() throws Exception {
         // First, register the user
-        testRegisterUserSuccess();
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")
+            .contentType("application/json")
+            .content("{\"username\":\"" + newUser + "\",\"password\":\"" + newPassword + "\"}"))
+            .andExpect(status().isCreated());
 
         // Simulate a POST request to /auth/login with a Json object containing registered username and password
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/login")
@@ -79,10 +80,12 @@ public class AuthControllerMvcTest {
     }
 
     @Test
-    @Order(3)
     public void testUpdatePasswordSuccess() throws Exception {
         // First, register the user
-        testRegisterUserSuccess();
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")
+            .contentType("application/json")
+            .content("{\"username\":\"" + newUser + "\",\"password\":\"" + newPassword + "\"}"))
+            .andExpect(status().isCreated());
 
         // Update the password
         // user().roles("USER") - simulate valid user
@@ -103,7 +106,6 @@ public class AuthControllerMvcTest {
     }
 
     @Test
-    @Order(4)
     public void testLogoutRedirect() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/auth/logout/redirect"))
             .andExpect(status().is3xxRedirection())
@@ -111,10 +113,12 @@ public class AuthControllerMvcTest {
     }
 
     @Test
-    @Order(5)
     public void testValidateJwtSuccess() throws Exception {
-        // First, register and login to get the JWT
-        testRegisterUserSuccess();
+        // First, register
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")
+            .contentType("application/json")
+            .content("{\"username\":\"" + newUser + "\",\"password\":\"" + newPassword + "\"}"))
+            .andExpect(status().isCreated());
 
         // Login to get the JWT
         MvcResult loginResult = mockMvc.perform(MockMvcRequestBuilders.post("/auth/login")
@@ -140,12 +144,7 @@ public class AuthControllerMvcTest {
     }
 
     @Test
-    @Order(6)
     public void testOauth2SocialLoginSuccess() throws Exception {
-        // Mock UserService methods - need checkForUserServiceInstance and createUserInUserService
-        Mockito.doReturn(true).when(authService).checkForUserServiceInstance();
-        Mockito.doNothing().when(authService).createUserInUserService(Mockito.anyInt(), Mockito.anyString());
-
         // Perform a GET request to /auth/login/oauth2 with a dummy user
         mockMvc.perform(MockMvcRequestBuilders.get("/auth/login/oauth2")
                 .with(oauth2Login()
