@@ -1,4 +1,4 @@
-package com.skillstorm.models;
+package com.skillstorm.authservice.models.unit;
 
 import org.junit.jupiter.api.Test;
 import org.meanbean.test.BeanVerifier;

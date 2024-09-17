@@ -1,4 +1,4 @@
-package com.skillstorm.authservice.exceptions;
+package com.skillstorm.authservice.exceptions.unit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -7,6 +7,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import com.skillstorm.authservice.exceptions.AuthException;
+import com.skillstorm.authservice.exceptions.ExceptionHandlerAdvice;
+import com.skillstorm.authservice.exceptions.Oauth2Exception;
+import com.skillstorm.authservice.exceptions.UserExistsException;
+import com.skillstorm.authservice.exceptions.UserNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 public class ExceptionHandlerAdviceTests {
