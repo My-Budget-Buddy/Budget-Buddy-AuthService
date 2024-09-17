@@ -138,4 +138,20 @@ public class AuthControllerMvcTest {
             .andExpect(jsonPath("$.jwtSubject").value(newUser))
             .andExpect(jsonPath("$.jwtClaim").value("fakeUserId"));
     }
+
+    @Test
+    @Order(6)
+    public void testOauth2SocialLoginSuccess() throws Exception {
+        // Mock UserService methods - need checkForUserServiceInstance and createUserInUserService
+        Mockito.doReturn(true).when(authService).checkForUserServiceInstance();
+        Mockito.doNothing().when(authService).createUserInUserService(Mockito.anyInt(), Mockito.anyString());
+
+        // Perform a GET request to /auth/login/oauth2 with a dummy user
+        mockMvc.perform(MockMvcRequestBuilders.get("/auth/login/oauth2")
+                .with(oauth2Login()
+                .attributes(attrs -> attrs.put("email", newUser))))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("https://frontend.skillstorm-congo.com/"))
+                .andExpect(cookie().exists("jwt"));
+    }
 }
