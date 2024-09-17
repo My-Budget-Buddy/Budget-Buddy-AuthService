@@ -28,7 +28,7 @@ import jakarta.transaction.Transactional;
 
 @SpringBootTest(
     classes = AuthServiceRunner.class,
-    properties = {
+    properties = { // Disabling to remove warnings - if removed, these will not prevent tests from passing.
         "eureka.client.enabled=false",
         "spring.cloud.discovery.enabled=false",
         "spring.cloud.config.enabled=false"
@@ -64,6 +64,22 @@ public class AuthControllerMvcTest {
     }
 
     @Test
+    public void testRegisterUserFailure_UserExists() throws Exception {
+        // First, register the user
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")
+            .contentType("application/json")
+            .content("{\"username\":\"" + newUser + "\",\"password\":\"" + newPassword + "\"}"))
+            .andExpect(status().isCreated());
+
+        // Attempt to register the same user again
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")
+            .contentType("application/json")
+            .content("{\"username\":\"" + newUser + "\",\"password\":\"" + newPassword + "\"}"))
+            .andExpect(status().isConflict())
+            .andExpect(content().string("That username is not available."));
+    }
+
+    @Test
     public void testLoginUserSuccess() throws Exception {
         // First, register the user
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")
@@ -77,6 +93,16 @@ public class AuthControllerMvcTest {
             .content("{\"username\":\"" + newUser + "\",\"password\":\"" + newPassword + "\"}"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.username").value(newUser));
+    }
+
+    @Test
+    public void testLoginUserFailure_InvalidCredentials() throws Exception {
+        // Attempt to login without registering
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/login")
+            .contentType("application/json")
+            .content("{\"username\":\"" + newUser + "\",\"password\":\"wrongPassword\"}"))
+            .andExpect(status().isUnauthorized())
+            .andExpect(content().string("User not found or bad credentials."));
     }
 
     @Test
