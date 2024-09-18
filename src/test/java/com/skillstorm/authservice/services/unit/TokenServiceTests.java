@@ -1,4 +1,4 @@
-package com.skillstorm.authservice.services;
+package com.skillstorm.authservice.services.unit;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +15,8 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 
 import com.skillstorm.authservice.repositories.UserCredentialsRepository;
+import com.skillstorm.authservice.services.TokenService;
+
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;

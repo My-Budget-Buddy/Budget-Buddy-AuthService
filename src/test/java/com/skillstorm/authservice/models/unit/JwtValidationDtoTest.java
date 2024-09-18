@@ -1,4 +1,4 @@
-package com.skillstorm.models;
+package com.skillstorm.authservice.models.unit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
