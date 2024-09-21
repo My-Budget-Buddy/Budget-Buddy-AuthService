@@ -19,10 +19,10 @@ spring:
               client-id: ${GOOGLE_CLIENT_ID}
               client-secret: ${GOOGLE_CLIENT_SECRET}
 
-# For testing only!
-#  jpa:
-#    hibernate:
-#      ddl-auto: update
+  # For testing only!
+  jpa:
+    hibernate:
+      ddl-auto: update
 
 eureka:
   client:
