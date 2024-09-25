@@ -73,7 +73,7 @@ pipeline {
   }
 
   environment {
-      SERVICE_NAME = 'auth-service'
+      SERVICE_NAME = 'auth-services'
       PASCAL_SERVICE_NAME = 'AuthService'
       CLIENT_ID = credentials('GITHUB_APP_CLIENT_ID')
       PEM = credentials('GITHUB_APP_PEM')
