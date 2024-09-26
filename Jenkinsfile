@@ -101,7 +101,7 @@ pipeline {
           steps{
             sh '''
             git clone https://github.com/My-Budget-Buddy/Budget-Buddy-Kubernetes.git
-            git clone -b daniel413x/pipeline https://github.com/My-Budget-Buddy/Budget-Buddy-Frontend-Testing.git
+            git clone -b testing-cohort-dev https://github.com/My-Budget-Buddy/Budget-Buddy-Frontend-Testing.git
             '''
           }
       }
@@ -266,7 +266,7 @@ pipeline {
                     "https://staging.api.skillstorm-congo.com/summarys"
                     "https://staging.api.skillstorm-congo.com/api/credit"
                 )
-
+                
                 # Function to check a single service, ignoring the status code
                 check_service() {
                     local service_url=$1
