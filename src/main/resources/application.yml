@@ -5,9 +5,9 @@ spring:
   application:
     name: auth-service
   datasource:
-    url: ${DATABASE_URL}
-    username: ${DATABASE_USER}
-    password: ${DATABASE_PASS}
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/my_budget_buddy}
+    username: ${DATABASE_USER:postgres}
+    password: ${DATABASE_PASS:}
   output:
     ansi:
       enabled: ALWAYS
@@ -19,10 +19,10 @@ spring:
               client-id: ${GOOGLE_CLIENT_ID}
               client-secret: ${GOOGLE_CLIENT_SECRET}
 
-# For testing only!
-#  jpa:
-#    hibernate:
-#      ddl-auto: update
+  # For testing only!
+  jpa:
+    hibernate:
+      ddl-auto: update
 
 eureka:
   client:

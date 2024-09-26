@@ -1,7 +1,9 @@
-package com.skillstorm.authservice.services;
+package com.skillstorm.authservice.services.unit;
 
 import com.skillstorm.authservice.models.UserCredentials;
 import com.skillstorm.authservice.repositories.UserCredentialsRepository;
+import com.skillstorm.authservice.services.CustomUserDetailsService;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

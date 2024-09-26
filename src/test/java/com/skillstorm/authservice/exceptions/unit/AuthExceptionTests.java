@@ -1,6 +1,9 @@
-package com.skillstorm.authservice.exceptions;
+package com.skillstorm.authservice.exceptions.unit;
 
 import org.junit.jupiter.api.Test;
+
+import com.skillstorm.authservice.exceptions.AuthException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class AuthExceptionTests {

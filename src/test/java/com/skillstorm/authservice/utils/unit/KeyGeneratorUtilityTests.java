@@ -1,4 +1,4 @@
-package com.skillstorm.authservice.utils;
+package com.skillstorm.authservice.utils.unit;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -12,6 +12,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.skillstorm.authservice.utils.KeyGeneratorUtility;
 
 @ExtendWith(MockitoExtension.class)
 public class KeyGeneratorUtilityTests {

@@ -1,4 +1,4 @@
-package com.skillstorm.services;
+package com.skillstorm.authservice.services.unit;
 
 import java.lang.reflect.Field;
 import java.net.URI;
@@ -118,6 +118,8 @@ public class AuthServiceTest {
      * @throws UserExistsException 
      */
 
+    /* Testing register */
+
     @Test
     public void testRegister() throws UserExistsException {
         // stub repo method to not find the username
@@ -174,6 +176,8 @@ public class AuthServiceTest {
         assertEquals("Error: User not registered. No instance of user-service available", exception.getMessage());
     }
 
+    /* Testing login */
+
     @Test
     public void testLogin() throws AuthException{
         String token = "secretToken";
@@ -213,6 +217,8 @@ public class AuthServiceTest {
         // verify the exception messages match
         assertEquals("User not found or bad credentials.", exception.getMessage());
     }
+
+    /* Testing oauth2Login */
 
     @Test
     public void testOauth2Login() {
@@ -264,6 +270,8 @@ public class AuthServiceTest {
         });
     }
 
+    /* Testing updatePassword */
+
     @Test
     public void testUpdatePassword() {
         UserCredentials user = new UserCredentials();
@@ -293,6 +301,8 @@ public class AuthServiceTest {
         // verify the response matches
         assertEquals("User not found", response);
     }
+
+    /* Testing findOrCreateUser */
 
     @Test
     public void testFindOrCreateUser() {
@@ -332,6 +342,8 @@ public class AuthServiceTest {
         verify(userCredentialsRepo).findByUsername(username);
     }
 
+    /* Testing getJwtClaim */
+
     @Test
     public void testGetJwtClaim() {
         String token = "token";
@@ -344,6 +356,8 @@ public class AuthServiceTest {
         // verify the tokens match
         assertEquals(token, newToken);
     }
+
+    /* Testing checkForUserServiceInstance */
 
     @Test
     public void testCheckForUserServiceInstance() {
@@ -369,6 +383,8 @@ public class AuthServiceTest {
         // verify the response is false
         assertFalse(response);
     }
+
+    /* Testing createUserInUserService */
 
     @Test
     public void testCreateUserInUserService() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
