@@ -307,7 +307,7 @@ pipeline {
             }
         }
 
-        stage('Functional Tests') {
+        stage('Functional Tests for Staging') {
             when {
                 branch 'testing-cohort'
             }
@@ -397,30 +397,32 @@ pipeline {
             }
         }
 
-        stage('Performance Test for Staging') {
+        stage('Performance Tests for Staging') {
         when {
-            branch 'testing-cohort'
+          branch 'testing-cohort'
         }
         steps {
-            sh '''
-                TRIES_REMAINING=16
+          sh '''
+              TRIES_REMAINING=16
 
-                echo 'Waiting for frontend to be ready...'
-                while ! curl --output /dev/null --silent https://staging.api.skillstorm-congo.com/${SERVICE_ROUTE}; do
-                    TRIES_REMAINING=$((TRIES_REMAINING - 1))
-                    if [ $TRIES_REMAINING -le 0 ]; then
-                        echo "***Service is ready***"
-                        exit 1
-                    fi
-                done
-            '''
-        
-            container('aws-kubectl') {
-                bzt "Budget-Buddy-PerformanceTests/stepping.yaml"
-                archiveArtifacts artifacts: '*/**.jtl', allowEmptyArchive: true
-            }
+              echo 'Waiting for frontend to be ready...'
+              while ! curl --output /dev/null --silent https://api.skillstorm-congo.com/${SERVICE_ROUTE}; do
+                  TRIES_REMAINING=$((TRIES_REMAINING - 1))
+                  if [ $TRIES_REMAINING -le 0 ]; then
+                      echo "***Service is ready***"
+                      exit 1
+                      fi
+                  done
+              '''
+          container("aws-kubectl") {
+              bzt "Budget-Buddy-PerformanceTests/0-stepping.yaml"
+              bzt "Budget-Buddy-PerformanceTests/1-stepping.yaml"
+              bzt "Budget-Buddy-PerformanceTests/2-stepping.yaml"
+              bzt "Budget-Buddy-PerformanceTests/3-stepping.yaml"
+              archiveArtifacts artifacts: '*/**.jtl', allowEmptyArchive: true
           }
         }
+      }
     }
 
     post {
